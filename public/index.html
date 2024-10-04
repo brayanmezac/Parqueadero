@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parqueadero</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1 class="mt-5">Registro de Parqueadero</h1>
+    <form id="parqueoForm">
+      <div class="mb-3">
+        <label for="placa" class="form-label">Placa del vehículo</label>
+        <input type="text" class="form-control" id="placa" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Registrar entrada</button>
+    </form>
+    <h2 class="mt-5">Lista de Parqueos</h2>
+    <ul id="parqueos" class="list-group"></ul>
+  </div>
+
+  <script>
+    document.getElementById('parqueoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const placa = document.getElementById('placa').value;
+      fetch('/registrar-entrada', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ placa }),
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert(data);
+        // Recargar la página después de registrar la entrada
+        window.location.reload();  // Esta línea recarga la página
+      })
+      .catch(error => console.error('Error:', error));
+    });
+
+    function cargarParqueos() {
+      fetch('/parqueos')
+        .then(response => response.json())
+        .then(data => {
+          const lista = document.getElementById('parqueos');
+          lista.innerHTML = '';
+          data.forEach(parqueo => {
+            const item = document.createElement('li');
+            item.className = 'list-group-item';
+            item.textContent = `Placa: ${parqueo.placa}, Hora de entrada: ${parqueo.horaEntrada}`;
+            lista.appendChild(item);
+          });
+        });
+    }
+
+    cargarParqueos();
+  </script>
+</body>
+</html>
